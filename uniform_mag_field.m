@@ -12,12 +12,12 @@ gamma = 6*pi*eta*a;
 N = 150;
 
 % Wall definitions taken from printing bed
-x_wall = [-0.5 0.5]*10.^-7;
-y_wall = [-0.5 0.5]*10.^-7;
-z_wall = [-0.5 0.5]*10.^-7;
+x_wall = [-0.6 0.6]*10.^-7;
+y_wall = [-0.6 0.6]*10.^-7;
+z_wall = [-0.6 0.6]*10.^-7;
 
 % Magnetic Field
-B = [400*10^-3 0 0 ]; %20 mT
+B = [0 0 400*10^-3 ]; %20 mT
 H_0 = B/(mu_0*(1+chi));
 m = 4*pi*(a.^3)*chi.*H_0/3;
 
@@ -92,7 +92,7 @@ drawnow;
 hold on;
 
 
-for time = 0:dt:10
+for time = 0:dt:5*10^-3
     Force = zeros(N,3);
     for i = 1:N-1
         for j = (i+1):N
@@ -149,15 +149,19 @@ for time = 0:dt:10
         F_pw_x = sum((2*F0)*exp(-10.*abs(dist_wall_x)./(2.*a) -0.5));
         if (dist_wall_x(1)<0 || dist_wall_x(1)<(a)) %too close/crossed
             F_pw_x = (2*F0)*tau;
+            Force(i,1) = 0;
         elseif (dist_wall_x(2)>0 || abs(dist_wall_x(2))<(a)) 
             F_pw_x = -(2*F0)*tau;
+            Force(i,1) = 0;
         end
 
         dist_wall_y = pos(i,2) - y_wall;
         F_pw_y = sum((2*F0)*exp(-10.*abs(dist_wall_y)./(2.*a) -0.5));
         if (dist_wall_y(1)<0 || dist_wall_y(1)<(a)) %too close/crossed
             F_pw_y = (2*F0)*tau;
+            Force(i,2) = 0;
         elseif (dist_wall_y(2)>0 || abs(dist_wall_y(2))<(a)) 
+            Force(i,2) = 0;
             F_pw_y = -(2*F0)*tau;
         end
 
@@ -166,7 +170,9 @@ for time = 0:dt:10
         F_pw_z = sum((2*F0)*exp(-10.*abs(dist_wall_z)./(2.*a) -0.5));
         if (dist_wall_z(1)<0 || dist_wall_z(1)<(a)) %too close/crossed
             F_pw_z = (2*F0)*tau;
+            Force(i,3) = 0;
         elseif (dist_wall_z(2)>0 || abs(dist_wall_z(2))<(a)) 
+            Force(i,3) = 0;
             F_pw_z = -(2*F0)*tau;
         end
 
