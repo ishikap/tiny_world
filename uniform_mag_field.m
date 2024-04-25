@@ -17,7 +17,7 @@ y_wall = [-0.6 0.6]*10.^-7;
 z_wall = [-0.6 0.6]*10.^-7;
 
 % Magnetic Field
-B = 400*10^-3.*[1 2 3]/sqrt(14); %20 mT
+B = 20*10^-3.*[1 0 0]; %20 mT
 H_0 = B/(mu_0*(1+chi));
 m = 4*pi*(a.^3)*chi.*H_0/3;
 
@@ -92,7 +92,7 @@ drawnow;
 hold on;
 
 
-for time = 0:dt:5*10^-3
+for time = 0:dt:10000
     Force = zeros(N,3);
     for i = 1:N-1
         for j = (i+1):N

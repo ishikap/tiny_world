@@ -9,7 +9,7 @@ a = 7*10^-9; %7nm
 chi = 16;
 eta = 0.08; %Pa*s
 gamma = 6*pi*eta*a;
-N = 150;
+N = 100;
 
 % Wall definitions taken from printing bed
 x_wall = [-0.6 0.6]*10.^-7;
@@ -17,19 +17,19 @@ y_wall = [-0.6 0.6]*10.^-7;
 z_wall = [-0.6 0.6]*10.^-7;
 
 % Magnetic Field
-B = [400*10^-3 0 0 ]; %20 mT
+B = 20*10^-3.*[1 0 0]; %20 mT
 H_0 = B/(mu_0*(1+chi));
 m = 4*pi*(a.^3)*chi.*H_0/3;
 
 % Magnetic Coupling Parameter
-lambda = mu_0*pi*(a^3)*(chi^2)*(norm(H_0)^2)/(9*k_B*T);
-phi_3d = (4*pi*a^3/3)*N/10^-21;
+% lambda = mu_0*pi*(a^3)*(chi^2)*(norm(H_0)^2)/(9*k_B*T);
+% phi_3d = (4*pi*a^3/3)*N/10^-21;
 
 
 % Normalisation
 F0 = (3*mu_0*norm(m)^2)/(4*pi*(2*a)^4);
 tc = (12*pi*eta*a^2)/F0;
-tau = 0.05;
+tau = 0.1;
 dt = tau*tc;
 
 % Initial Positions: A voxel from -1mu_m to 1mu_m in every direction
@@ -79,7 +79,7 @@ zlim([-1*10^-7 1*10^-7])
 xlabel('x');
 ylabel('y');
 zlabel('z');
-annstr = sprintf('Magnetic Field = <%0.3f, %0.3f, %0.3f> T', B(1), B(2), B(3) ); % annotation text
+annstr = sprintf('Magnetic Field = 20mT, Rotation Frequency = 20Hz'); % annotation text
 annpos = [0.39 0.87 0.1 0.1]; % annotation position in figure coordinates
 ha = annotation('textbox',annpos,'string',annstr);
 ha.FontSize = 20;
@@ -91,8 +91,13 @@ drawnow;
 
 hold on;
 
-
-for time = 0:dt:10
+B0 = 20*10^-3;
+freq = 20;
+w = 2*pi*freq;
+for time = 0:dt:1000
+    B = B0.*[cos(w*time) sin(w*time) 0]; %20 mT
+    H_0 = B/(mu_0*(1+chi));
+    m = 4*pi*(a.^3)*chi.*H_0/3;
     Force = zeros(N,3);
     for i = 1:N-1
         for j = (i+1):N
