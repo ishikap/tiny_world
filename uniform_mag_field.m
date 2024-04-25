@@ -17,7 +17,7 @@ y_wall = [-0.5 0.5]*10.^-7;
 z_wall = [-0.5 0.5]*10.^-7;
 
 % Magnetic Field
-B = [400*10^-3*cosd(45) 400*10^-3*cosd(45) 0 ]; %20 mT
+B = [400*10^-3 0 0 ]; %20 mT
 H_0 = B/(mu_0*(1+chi));
 m = 4*pi*(a.^3)*chi.*H_0/3;
 
@@ -59,14 +59,14 @@ end
 % Plotting
 % First define a sphere
 figure
-set(gcf, 'Position',  [100, 100, 1500, 1200]);
+set(gcf, 'Position',  [100, 100, 1100, 1200]);
 [X_sp, Y_sp, Z_sp] = sphere;
 X_sp = X_sp*a;
 Y_sp = Y_sp*a;
 Z_sp = Z_sp*a;
 % Surface plot each sphere individually
 sp = [];
-colormap("gray")
+colormap("sky")
 %figure('units','normalized','outerposition',[0 0 1 1])
 for i = 1:N
     plot_sphere = surf(X_sp+pos(i,1), Y_sp+pos(i,2), Z_sp+pos(i,3));
@@ -92,7 +92,7 @@ drawnow;
 hold on;
 
 
-for time = 0:dt:10000000
+for time = 0:dt:10
     Force = zeros(N,3);
     for i = 1:N-1
         for j = (i+1):N
@@ -147,12 +147,29 @@ for time = 0:dt:10000000
         % Short Range Repulsive force from wall to particle i
         dist_wall_x = pos(i,1) - x_wall;
         F_pw_x = sum((2*F0)*exp(-10.*abs(dist_wall_x)./(2.*a) -0.5));
+        if (dist_wall_x(1)<0 || dist_wall_x(1)<(a)) %too close/crossed
+            F_pw_x = (2*F0)*tau;
+        elseif (dist_wall_x(2)>0 || abs(dist_wall_x(2))<(a)) 
+            F_pw_x = -(2*F0)*tau;
+        end
 
         dist_wall_y = pos(i,2) - y_wall;
         F_pw_y = sum((2*F0)*exp(-10.*abs(dist_wall_y)./(2.*a) -0.5));
+        if (dist_wall_y(1)<0 || dist_wall_y(1)<(a)) %too close/crossed
+            F_pw_y = (2*F0)*tau;
+        elseif (dist_wall_y(2)>0 || abs(dist_wall_y(2))<(a)) 
+            F_pw_y = -(2*F0)*tau;
+        end
+
 
         dist_wall_z = pos(i,3) - z_wall;
         F_pw_z = sum((2*F0)*exp(-10.*abs(dist_wall_z)./(2.*a) -0.5));
+        if (dist_wall_z(1)<0 || dist_wall_z(1)<(a)) %too close/crossed
+            F_pw_z = (2*F0)*tau;
+        elseif (dist_wall_z(2)>0 || abs(dist_wall_z(2))<(a)) 
+            F_pw_z = -(2*F0)*tau;
+        end
+
 
         % Add random brownian motion to particle i
         R = normrnd(0,1,[1,3])*12*pi*a*eta*k_B*T/dt;
